@@ -509,7 +509,7 @@ BUYSELLJET () {
     case $BSJ in
          [b/B] ) echo && BUYING 
              ;;
-         [l/L] ) echo && SELLING
+         [s/S] ) echo && SELLING
              ;;
          [j/J] ) echo && JET
              ;;
