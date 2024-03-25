@@ -13,9 +13,9 @@ ROLLPRICES () { # this happens at the start of the game and whenever you jet
     CPRICE=$(( $(shuf -n1 --input-range=1200-1800) * 10 ))
     HPRICE=$(( $(shuf -n1 -i1000-1500) * 10 ))
     FPRICE=$(( $(shuf -n1 -i600-900) * 10 ))
-    WPRICE=$(( $(shuf -n1 -i400-600) * 10 ))
-    SPRICE=$(( $(shuf -n1 -i80-400) * 10 ))
-    LPRICE=$(( $(shuf -n1 -i40-100) * 10 ))
+    MPRICE=$(( $(shuf -n1 -i400-600) * 10 ))
+    LPRICE=$(( $(shuf -n1 -i80-400) * 10 ))
+    WPRICE=$(( $(shuf -n1 -i40-100) * 10 ))
 }
 
 
@@ -235,10 +235,10 @@ ${SPW}STASH$(SP $((WID-W-5-$((${#GEO}/2)))))$GEO$(SP $((W-$((${#GEO}/2)))))TRENC
 $(US $WIDTH)
 ${SPW}COCAINE $SCOCAINE$(DSP C) |${SPW}COCAINE $TCOCAINE
 ${SPW}HEROIN  $SHEROIN$(DSP H)  |${SPW}HEROIN  $THEROIN
-${SPW}FENTANYL    $SFENTANYL$(DSP A)    |${SPW}FENTANYL    $TFENTANYL
+${SPW}FENTANYL    $SFENTANYL$(DSP A)|${SPW}FENTANYL    $TFENTANYL
 ${SPW}METH    $SMETH$(DSP W)    |${SPW}METH    $TMETH
-${SPW}LSD   $SLSD$(DSP S)   |${SPW}LSD   $TLSD
-${SPW}WEED   $SWEED$(DSP L)   |${SPW}WEED   $TWEED
+${SPW}LSD   $SLSD$(DSP S)     |${SPW}LSD   $TLSD
+${SPW}WEED   $SWEED$(DSP L)    |${SPW}WEED   $TWEED
 $(SP $((WID-1))) |
 ${SPW}BANK    $BANK$(DSP B)     |${SPW}GUNS    $GUNS
 ${SPW}DEBT    $DEBT$(DSP D)     |${SPW}CASH    $CASH
@@ -255,9 +255,9 @@ SHOWPRICES () {  # displays the current prices, changes when ROLLPRICES () happe
     SHOWPRICES=""$(cat << EOF # $(SP $W)
 HEY DUDE, THE PRICES OF DRUGS HERE ARE:
 
-${SPWI}COCAINE    $CPRICE$(SP $((WID-WI-11-${#CPRICE})))METH       $WPRICE
-${SPWI}HEROIN     $HPRICE$(SP $((WID-WI-11-${#HPRICE})))LSD      $SPRICE
-${SPWI}FENTANYL       $FPRICE$(SP $((WID-WI-11-${#FPRICE})))WEED      $LPRICE
+${SPWI}COCAINE    $CPRICE$(SP $((WID-WI-11-${#CPRICE})))METH      $MPRICE
+${SPWI}HEROIN     $HPRICE$(SP $((WID-WI-11-${#HPRICE})))LSD       $LPRICE
+${SPWI}FENTANYL   $FPRICE$(SP $((WID-WI-11-${#FPRICE})))WEED      $WPRICE
 EOF
     )""
     HUD
@@ -525,10 +525,10 @@ esac
 AFFORDABILITY () {
     let C_AFFORD=CASH/CPRICE
     let H_AFFORD=CASH/HPRICE
-    let A_AFFORD=CASH/FPRICE
-    let W_AFFORD=CASH/WPRICE
-    let S_AFFORD=CASH/SPRICE
+    let F_AFFORD=CASH/FPRICE
+    let M_AFFORD=CASH/MPRICE
     let L_AFFORD=CASH/LPRICE
+    let W_AFFORD=CASH/WPRICE
 }
 
 BUYDRUG () {
@@ -581,9 +581,9 @@ PROFITABILITY () {
     let C_PROFT=$((COCAINE*CPRICE))
     let H_PROFIT=$((HEROIN*HPRICE))
     let A_PROFIT=$((FENTANYL*FPRICE))
-    let W_PROFIT=$((METH*WPRICE))
-    let S_PROFIT=$((LSD*SPRICE))
-    let L_PROFIT=$((WEED*LPRICE))
+    let W_PROFIT=$((METH*MPRICE))
+    let S_PROFIT=$((LSD*LPRICE))
+    let L_PROFIT=$((WEED*WPRICE))
 }
 
 SELLDRUG () {
@@ -856,7 +856,7 @@ COKEBUST () {
 
 METHBOTTOMOUT () {
     HUD
-    WPRICE=$((WPRICE/5))
+    MPRICE=$((MPRICE/5))
     read -n1 -p 'COLOMBIAN FREIGHTER DUSTED THE COAST GUARD !!  METH PRICES HAVE BOTTOMED OUT !!'
     MAINMENU
 }
@@ -948,7 +948,7 @@ PARAQUAT () {
 
 CHEAPWEED () {
     HUD
-    LPRICE=$((LPRICE/6))
+    WPRICE=$((WPRICE/6))
     read -n1 -p 'RIVAL DRUG DEALERS RADED A PHARMACY AND ARE SELLING  C H E A P   W E E D !!!'
     MAINMENU
 }
