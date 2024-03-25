@@ -10,12 +10,12 @@ GAMEDATE () { # true to original date, format is MM / DD / YYYY
 }
 
 ROLLPRICES () { # this happens at the start of the game and whenever you jet
-    CPRICE=$(( $(shuf -n1 --input-range=1500-3000) * 10 ))
-    HPRICE=$(( $(shuf -n1 -i500-1400) * 10 ))
-    APRICE=$(( $(shuf -n1 -i100-450) * 10 ))
-    WPRICE=$(( $(shuf -n1 -i30-90) * 10 ))
-    SPRICE=$(( $(shuf -n1 -i7-25) * 10 ))
-    LPRICE=$(( $(shuf -n1 -i1-6) * 10 ))
+    CPRICE=$(( $(shuf -n1 --input-range=1200-1800) * 10 ))
+    HPRICE=$(( $(shuf -n1 -i1000-1500) * 10 ))
+    APRICE=$(( $(shuf -n1 -i600-900) * 10 ))
+    WPRICE=$(( $(shuf -n1 -i400-600) * 10 ))
+    SPRICE=$(( $(shuf -n1 -i80-400) * 10 ))
+    LPRICE=$(( $(shuf -n1 -i40-100) * 10 ))
 }
 
 
@@ -34,30 +34,30 @@ TERMINFO () { # terminal based GUI to keep it old school; the WIDTH, WID, WI, W 
 RESETVALUES () { # initialize the game values
     DAY=0
 
-    GEO=BRONX
-    CASH=2000
+    GEO=NEWYORK
+    CASH=5000
     GUNS=0
     BANK=0
-    DEBT=5500
-    MAXLOAN=9450
+    DEBT=10000
+    MAXLOAN=20000
     HOLD=100
 
     SCOCAINE=0
     SHEROIN=0
-    SACID=0
+    SFENTANYL=0
+    SMETH=0
+    SLSD=0
     SWEED=0
-    SSPEED=0
-    SLUDES=0
 
     TCOCAINE=0
     THEROIN=0
-    TACID=0
+    TFENTANYL=0
+    TMETH=0
+    TLSD=0
     TWEED=0
-    TSPEED=0
-    TLUDES=0
 
     STATE=begin
-    DAMAGE=0
+    HEALTH=100
     COPS=0
 }
 
@@ -85,19 +85,19 @@ DSP () { # print space for the products
             ;;
         H ) space=$((WID-W-10-${#SHEROIN}))
             ;;
-        A ) space=$((WID-W-12-${#SACID}))
+        A ) space=$((WID-W-12-${#SFENTANYL}))
             ;;
-        W ) space=$((WID-W-12-${#SWEED}))
+        W ) space=$((WID-W-12-${#SMETH}))
             ;;
-        S ) space=$((WID-W-11-${#SSPEED}))
+        S ) space=$((WID-W-11-${#SLSD}))
             ;;
-        L ) space=$((WID-W-11-${#SLUDES}))
+        L ) space=$((WID-W-11-${#SWEED}))
             ;;
         B ) space=$((WID-W-13-${#BANK}))
             ;;
         D ) space=$((WID-W-13-${#DEBT}))
             ;;
-        DAMAGE ) space=$((WID-W-13-${#DAMAGE}))
+        HEALTH ) space=$((WID-W-13-${#HEALTH}))
             ;;
         COPS ) space=$((WID-W-11-${#COPS}))
             ;;
@@ -122,12 +122,19 @@ $(SP $((WID-15)))ORIGINAL BY JOHN E. DELL (1984)
 
 $(SP $((WID-15)))BOURNE AGAIN BY A. J. S. (2019)
 
-
+$(SP $((WID-13)))UPDATE BY NATCH_69 (2024)
 
 EOF
     )""
     cat <<< $STARTMSG
     echo
+    SP $((WID-13))
+    read -p "Enter your username:" USERNAME
+
+    save_status "$USERNAME"
+    load_status "$USERNAME"
+    echo
+
     SP $((WID-13))
     read -n1 -p "DO YOU WANT INSTRUCTIONS? "
     if [[ $REPLY = [y/Y] ]]; then
@@ -150,15 +157,15 @@ $(SP $((WID-20)))Then, make as much money as you can in a
 $(SP $((WID-20)))1 month period. If you deal too heavily
 $(SP $((WID-20)))in  drugs,  you  might  run  into  the
 $(SP $((WID-20)))police $(echo '!!')  Your main drug stash will be
-$(SP $((WID-20)))in the Bronx. (It's a nice neighborhood)
+$(SP $((WID-20)))in NEW YORK.
 $(SP $((WID-20)))The prices of drugs per unit are:
 $(SP $((WID-20)))
 $(SP $((WID-20)))      COCAINE     15000-30000
 $(SP $((WID-20)))      HEROIN      5000-14000
-$(SP $((WID-20)))      ACID        1000-4500
-$(SP $((WID-20)))      WEED        300-900
-$(SP $((WID-20)))      SPEED       70-250
-$(SP $((WID-20)))      LUDES       10-60
+$(SP $((WID-20)))      FENTANYL        1000-4500
+$(SP $((WID-20)))      METH        300-900
+$(SP $((WID-20)))      LSD       70-250
+$(SP $((WID-20)))      WEED       10-60
 $(SP $((WID-20)))
 $(SP $((WID-20)))    (HIT ANY KEY TO START GAME)
 
@@ -170,6 +177,50 @@ EOF
         MAINMENU
 }
 
+save_status() {
+    USER_FILE="${1}_status.txt"  # The user's status file
+    cat << EOF > "$USER_FILE"
+DAY=$DAY
+GEO=$GEO
+CASH=$CASH
+GUNS=$GUNS
+BANK=$BANK
+DEBT=$DEBT
+MAXLOAN=$MAXLOAN
+HOLD=$HOLD
+SCOCAINE=$SCOCAINE
+SHEROIN=$SHEROIN
+SFENTANYL=$SFENTANYL
+SMETH=$SMETH
+SLSD=$SLSD
+SWEED=$SWEED
+TCOCAINE=$TCOCAINE
+THEROIN=$THEROIN
+TFENTANYL=$TFENTANYL
+TMETH=$TMETH
+TLSD=$TLSD
+TWEED=$TWEED
+STATE=$STATE
+HEALTH=$HEALTH
+COPS=$COPS
+EOF
+    echo "Status saved for user: $1"
+    echo "Saved status for user: $1 on $(date)" >> game_log.txt
+}
+
+load_status() {
+    USER_FILE="${1}_status.txt"  # The user's status file
+    if [ -f "$USER_FILE" ]; then
+        source "$USER_FILE"
+        echo "Status loaded for user: $1"
+        echo "Loaded status for user: $1 on $(date)" >> game_log.txt
+    else
+        echo "No saved status found for user: $1"
+        echo "Attempted to load status for user: $1 on $(date)" >> game_log.txt
+    fi
+}
+
+
 
 HUD () {  # HUD (Heads Up Display) shows the stash and coat values and is also a function and a variable
     TERMINFO
@@ -178,16 +229,16 @@ HUD () {  # HUD (Heads Up Display) shows the stash and coat values and is also a
 
     HUD=""$(cat << EOF
 
-${SPW}DATE $(GAMEDATE $DAY)$(SP $((WID-16)))HOLD    $HOLD
-
+${SPW}DATE $(GAMEDATE $DAY)$(SP $((WID-8)))HOLD    $HOLD
+${SPW}$(SP $((WID+4)))     HEALTH   $HEALTH 
 ${SPW}STASH$(SP $((WID-W-5-$((${#GEO}/2)))))$GEO$(SP $((W-$((${#GEO}/2)))))TRENCHCOAT
 $(US $WIDTH)
 ${SPW}COCAINE $SCOCAINE$(DSP C) |${SPW}COCAINE $TCOCAINE
 ${SPW}HEROIN  $SHEROIN$(DSP H)  |${SPW}HEROIN  $THEROIN
-${SPW}ACID    $SACID$(DSP A)    |${SPW}ACID    $TACID
-${SPW}WEED    $SWEED$(DSP W)    |${SPW}WEED    $TWEED
-${SPW}SPEED   $SSPEED$(DSP S)   |${SPW}SPEED   $TSPEED
-${SPW}LUDES   $SLUDES$(DSP L)   |${SPW}LUDES   $TLUDES
+${SPW}FENTANYL    $SFENTANYL$(DSP A)    |${SPW}FENTANYL    $TFENTANYL
+${SPW}METH    $SMETH$(DSP W)    |${SPW}METH    $TMETH
+${SPW}LSD   $SLSD$(DSP S)   |${SPW}LSD   $TLSD
+${SPW}WEED   $SWEED$(DSP L)   |${SPW}WEED   $TWEED
 $(SP $((WID-1))) |
 ${SPW}BANK    $BANK$(DSP B)     |${SPW}GUNS    $GUNS
 ${SPW}DEBT    $DEBT$(DSP D)     |${SPW}CASH    $CASH
@@ -204,9 +255,9 @@ SHOWPRICES () {  # displays the current prices, changes when ROLLPRICES () happe
     SHOWPRICES=""$(cat << EOF # $(SP $W)
 HEY DUDE, THE PRICES OF DRUGS HERE ARE:
 
-${SPWI}COCAINE    $CPRICE$(SP $((WID-WI-11-${#CPRICE})))WEED       $WPRICE
-${SPWI}HEROIN     $HPRICE$(SP $((WID-WI-11-${#HPRICE})))SPEED      $SPRICE
-${SPWI}ACID       $APRICE$(SP $((WID-WI-11-${#APRICE})))LUDES      $LPRICE
+${SPWI}COCAINE    $CPRICE$(SP $((WID-WI-11-${#CPRICE})))METH       $WPRICE
+${SPWI}HEROIN     $HPRICE$(SP $((WID-WI-11-${#HPRICE})))LSD      $SPRICE
+${SPWI}FENTANYL       $APRICE$(SP $((WID-WI-11-${#APRICE})))WEED      $LPRICE
 EOF
     )""
     HUD
@@ -284,13 +335,13 @@ STASHING () { # Stash product type selector
             ;;
         [h/H] ) STASHDEPOSIT HEROIN
             ;;
-        [a/A] ) STASHDEPOSIT ACID
+        [a/A] ) STASHDEPOSIT FENTANYL
             ;;
-        [w/W] ) STASHDEPOSIT WEED
+        [w/W] ) STASHDEPOSIT METH
             ;;
-        [s/S] ) STASHDEPOSIT SPEED
+        [s/S] ) STASHDEPOSIT LSD
             ;;
-        [l/L] ) STASHDEPOSIT LUDES
+        [l/L] ) STASHDEPOSIT WEED
             ;;
         * ) STASH
             ;;
@@ -327,14 +378,57 @@ STASHDEPOSIT () { # stashing arithmetic and logic
 
 }
 
+HOSPITAL () {
+    HUD 
+    read -n1 -p "DO YOU WISH TO VISIT THE HOSPITAL? " YNO
+    if [[ $YNO = [n/N] ]]; then {
+        echo
+        MAINMENU
+    }
+    elif [[ $YNO = [y/Y] ]]; then {
+        echo
+        DOCTORING
+    }
+    else
+        MAINMENU
+    fi
+    MAINMENU
+}
 
+DOCTORING () {
+    FIGHTHUD
+    DOCPRICEMULTIPLY=$(shuf -n1 -i "6000-10000")
+    read -n1 -p "WILL YOU PAY $DOCPRICEMULTIPLY DOLLARS TO HAVE A DOCTOR SEW YOU UP ?" YNO
+    if [[ $YNO = [n/N] ]]; then {
+        echo
+        MAINMENU
+    }
+    elif [[ $YNO = [y/Y] ]]; then {
+        echo
+        if [[ $DOCPRICEMULTIPLY -le $CASH ]] && [[ $DOCPRICEMULTIPLY -gt 0 ]]; then {
+        let HEALTH=100
+        let CASH=CASH-DOCPRICEMULTIPLY
+        } 
+        else {
+            FIGHTHUD
+            read -n1 -p 'DOCTOR SAID: GET DA FUCK OUTTA MY OFFICE YOU POOR BASTARD !!!'
+        }
+        fi 
+        MAINMENU
+
+    }
+    else
+        MAINMENU
+    fi
+    MAINMENU
+}
 
 BANKING () { # use the bank
     HUD
     read -n1 -p "DO YOU WISH TO VISIT THE BANK? " YNO
     if [[ $YNO = [n/N] ]]; then {
         echo
-        MAINMENU
+        HOSPITAL
     }
     elif [[ $YNO = [y/Y] ]]; then {
         echo
@@ -363,12 +457,12 @@ BANKING () { # use the bank
             BANKING
         }
         else :;
-            MAINMENU
+            HOSPITAL
         fi
-        MAINMENU
+        HOSPITAL
     }
     else
-        MAINMENU
+        HOSPITAL
     fi
 
 }
@@ -380,7 +474,7 @@ MAINMENU () {
         begin )     STATE=normal
                     [[ $DAY = 0 ]] && LOAN
             ;;
-        BRONXDO )   STATE=normal
+        NEWYORKDO )   STATE=normal
                     LOAN
             ;;
         normal )    BUYSELLJET
@@ -415,13 +509,13 @@ BUYING () {
         ;;
     [h/H] ) BUYDRUG HEROIN
         ;;
-    [a/A] ) BUYDRUG ACID
+    [a/A] ) BUYDRUG FENTANYL
         ;;
-    [w/W] ) BUYDRUG WEED
+    [w/W] ) BUYDRUG METH
         ;;
-    [s/S] ) BUYDRUG SPEED
+    [s/S] ) BUYDRUG LSD
         ;;
-    [l/L] ) BUYDRUG LUDES
+    [l/L] ) BUYDRUG WEED
         ;;
     * ) MAINMENU
         ;;
@@ -470,13 +564,13 @@ SELLING () {
         ;;
     [h/H] ) SELLDRUG HEROIN
         ;;
-    [a/A] ) SELLDRUG ACID
+    [a/A] ) SELLDRUG FENTANYL
         ;;
-    [w/W] ) SELLDRUG WEED
+    [w/W] ) SELLDRUG METH
         ;;
-    [s/S] ) SELLDRUG SPEED
+    [s/S] ) SELLDRUG LSD
         ;;
-    [l/L] ) SELLDRUG LUDES
+    [l/L] ) SELLDRUG WEED
         ;;
     * ) MAINMENU
         ;;
@@ -486,10 +580,10 @@ esac
 PROFITABILITY () {
     let C_PROFT=$((COCAINE*CPRICE))
     let H_PROFIT=$((HEROIN*HPRICE))
-    let A_PROFIT=$((ACID*APRICE))
-    let W_PROFIT=$((WEED*WPRICE))
-    let S_PROFIT=$((SPEED*SPRICE))
-    let L_PROFIT=$((LUDES*LPRICE))
+    let A_PROFIT=$((FENTANYL*APRICE))
+    let W_PROFIT=$((METH*WPRICE))
+    let S_PROFIT=$((LSD*SPRICE))
+    let L_PROFIT=$((WEED*LPRICE))
 }
 
 SELLDRUG () {
@@ -519,22 +613,29 @@ SELLDRUG () {
 JET () {
     HUD
     echo
-    echo "$(SP $W)1"")""  BRONX$(SP $W)2"")""  GHETTO$(SP $W)  3"")""  CENTRAL PARK"
-    echo "$(SP $W)4"")""  MANHATTAN$(SP $((W-4)))5"")""  CONEY ISLAND$(SP $((W-4)))6"")""  BROOKLYN"
+    echo "$(SP $W)1"")""  NEW YORK, USA$(SP $W)2"")""  LOS ANGELES, USA$(SP $W)  3"")""  RIO DE JANEIRO, BRAZIL"
+    echo "$(SP $W)4"")""  MEXICO CITY, MEXICO$(SP $((W-6)))5"")""  BANGKOK, THAILAND$(SP $((W+1)))6"")""  MOSCOW, RUSSIA"
+    echo "$(SP $W)7"")""  SEOUL, SOUTH KOREA$(SP $((W-5)))8"")""  SYDNEY, AUSTRALIA$(SP $((W+1)))9"")""  MUMBAI, INDIA"
     read -n1 -p "WHERE TO DUDE: "
     case $REPLY in
-        1 ) GEO=BRONX
-            STATE=BRONXDO && NEWDAY
+        1 ) GEO="NEW YORK, USA"
+            STATE=NEWYORKDO && NEWDAY
             ;;
-        2 ) GEO=GHETTO && NEWDAY
+        2 ) GEO="LOS ANGELES, USA" && NEWDAY
             ;;
-        3 ) GEO="CENTRAL PARK" && NEWDAY
+        3 ) GEO="RIO DE JANEIRO, BRAZIL" && NEWDAY
             ;;
-        4 ) GEO=MANHATTAN && NEWDAY
+        4 ) GEO="MEXICO CITY, MEXICO" && NEWDAY
             ;;
-        5 ) GEO="CONEY ISLAND" && NEWDAY
+        5 ) GEO="BANGKOK, THAILAND" && NEWDAY
             ;;
-        6 ) GEO=BROOKLYN && NEWDAY
+        6 ) GEO="MOSCOW, RUSSIA" && NEWDAY
+            ;;
+        7 ) GEO="SEOUL, SOUTH KOREA" && NEWDAY
+            ;;
+        8 ) GEO="SYDNEY, AUSTRALIA" && NEWDAY
+            ;;
+        9 ) GEO="MUMBAI, INDIA" && NEWDAY
             ;;
         * ) MAINMENU
             ;;
@@ -575,7 +676,7 @@ FIGHTHUD () {
 
 $(BLOCKS $WIDTH)
 
-$(SP $W)DAMAGE   $DAMAGE$(DSP DAMAGE)COPS   $COPS$(DSP COPS)GUNS   $GUNS
+$(SP $W)HEALTH   $DAMAGE$(DSP HEALTH)COPS   $COPS$(DSP COPS)GUNS   $GUNS
 
 $(BLOCKS $WIDTH)
 EOF
@@ -589,7 +690,7 @@ FIGHT () {
     TERMINFO
     FIGHTHUD
     # end game if dead
-    if [[ $DAMAGE -ge 50 ]]; then {
+    if [[ $HEALTH -le 0 ]]; then {
         read -n1 -p 'THEY WASTED YOU MAN !! WHAT A DRAG !!!'
         exit
     }
@@ -635,35 +736,31 @@ FIGHT () {
             }
             fi
         }
-        elif [[ $REPLY = [f/F] ]]; then { # fighting
-            FIGHTHUD
-            echo "YOU'RE FIRING ON THEM "'!!'
-            sleep 0.5
-            KILLTHEM=$(($(shuf -n1 -i "0-$((GUNS*2))")))
-            if [[ $KILLTHEM = 0 ]]; then {
-                FIGHTHUD
-                echo 'YOU MISSED THEM !!'
-                sleep 0.5
-                FIRINGONYOU
-            }
-            elif [[ $KILLTHEM -gt 0 ]]; then {
-                FIGHTHUD
-                COPS=$((COPS-1))
-                if [[ $COPS -le 0 ]]; then {
-                    FIGHTHUD
-                    echo 'YOU KILLED ALL OF THEM!!!!'
-                    sleep 0.5
-                    FIGHTREWARD
-                }
-                fi
-                echo 'YOU KILLED ONE!!'
-                sleep 0.5
-                FIRINGONYOU
-                FIGHT
-
-            }
-            fi
-        }
+        elif [[ $REPLY = [fF] ]]; then
+          FIGHTHUD
+          echo "YOU'RE FIRING ON THEM!!"
+          sleep 0.5
+          KILLTHEM=$(shuf -n1 -i "0-$((GUNS*2))")
+          if [[ $KILLTHEM -eq 0 ]]; then
+              FIGHTHUD
+              echo "YOU MISSED THEM!!"
+              sleep 0.5
+              FIRINGONYOU
+          elif [[ $KILLTHEM -gt 0 ]]; then
+              FIGHTHUD
+              KILLNUMBER=$(shuf -n1 -i "1-$GUNS")
+              COPS=$((COPS-KILLNUMBER))
+              if [[ $COPS -le 0 ]]; then
+                  FIGHTHUD
+                  echo "YOU KILLED ALL OF THEM!!!!"
+                  sleep 0.5
+                  FIGHTREWARD
+              fi
+              echo "YOU KILLED $KILLNUMBER OF THEM!!"
+              sleep 1.5
+              FIRINGONYOU
+              FIGHT
+          fi
         else {
             FIGHT
         }
@@ -684,7 +781,7 @@ FIRINGONYOU () {
         FIGHT
     }
     elif [[ $DAMAGEHIT -gt 0 ]]; then {
-        DAMAGE=$((DAMAGE+DAMAGEHIT))
+        HEALTH=$((HEALTH-DAMAGEHIT))
         FIGHTHUD
         echo "YOU'VE BEEN HIT "'!!'
         sleep 0.5
@@ -695,7 +792,7 @@ FIRINGONYOU () {
 
 FIGHTREWARD () {
     FIGHTHUD
-    FIGHTREWARD=$(shuf -n1 -i "200-1000")
+    FIGHTREWARD=$(shuf -n1 -i "200-2000")
     CASH=$((CASH+FIGHTREWARD))
     read -n1 -p "YOU FOUND $FIGHTREWARD DOLLARS ON OFFICER HARDASS' CARCAS "'!!!'
     MAINMENU
@@ -704,7 +801,7 @@ FIGHTREWARD () {
 DOCTOR () {
     FIGHTHUD
     DOCPRICEMULTIPLY=$(shuf -n1 -i "200-1000")
-    DOC=$((DAMAGE*50))
+    DOC=$((HEALTH*50))
     WILL YOU PAY%
     DOLLARS TO HAVE A DOCTOR SEW YOU UP ?
 }
@@ -719,7 +816,7 @@ ROLLEVENT () {
             ;;
         4 ) COKEBUST
             ;;
-        5 ) WEEDBOTTOMOUT
+        5 ) METHBOTTOMOUT
             ;;
         6 ) POLICEDOGS
             ;;
@@ -727,13 +824,13 @@ ROLLEVENT () {
             ;;
         8 ) CHEAPHEROIN
             ;;
-        9 ) FINDLUDES
+        9 ) FINDWEED
             ;;
         10 ) PARAQUAT
             ;;
-        11 ) CHEAPLUDES
+        11 ) CHEAPWEED
             ;;
-        12 ) CHEAPACID
+        12 ) CHEAPFENTANYL
             ;;
         13 ) GUNSALE
             ;;
@@ -757,17 +854,17 @@ COKEBUST () {
 
 }
 
-WEEDBOTTOMOUT () {
+METHBOTTOMOUT () {
     HUD
     WPRICE=$((WPRICE/5))
-    read -n1 -p 'COLOMBIAN FREIGHTER DUSTED THE COAST GUARD !!  WEED PRICES HAVE BOTTOMED OUT !!'
+    read -n1 -p 'COLOMBIAN FREIGHTER DUSTED THE COAST GUARD !!  METH PRICES HAVE BOTTOMED OUT !!'
     MAINMENU
 }
 
 POLICEDOGS () {
     if [[ $HOLD -lt 70 ]]; then
         n=$(shuf -n1 -i 2-5)
-        DRUGSARR=(COCAINE HEROIN ACID WEED SPEED LUDES)
+        DRUGSARR=(COCAINE HEROIN FENTANYL METH LSD WEED)
         for DRUG in ${DRUGSARR[@]}; do
             DROPPED=$((T$DRUG/$n))
             let HOLD=$((HOLD+DROPPED))
@@ -782,13 +879,13 @@ POLICEDOGS () {
 }
 
 BROWNIES () {
-    if [[ $TWEED -gt 1 ]]; then
+    if [[ $TMETH -gt 1 ]]; then
         n=$(shuf -n1 -i 1-5)
-        DROPPED=$((TWEED/$n))
+        DROPPED=$((TMETH/$n))
         let HOLD=$((HOLD+DROPPED))
-        let TWEED=$((TWEED-DROPPED))
+        let TMETH=$((TMETH-DROPPED))
         HUD
-        echo 'YOUR MAMA MADE SOME BROWNIES AND USED YOUR WEED !!'
+        echo 'YOUR MAMA MADE SOME BROWNIES AND USED YOUR METH !!'
         sleep 0.5
         echo
         read -n1 -p 'THEY WERE GREAT !!'
@@ -804,7 +901,7 @@ CHEAPHEROIN () {
 
 }
 
-FINDLUDES () {
+FINDWEED () {
     if [[ $HOLD -gt 30 ]]; then
         n=$(shuf -n1 -i 1-15)
         i=$(shuf -n1 -i 1-6)
@@ -813,13 +910,13 @@ FINDLUDES () {
                 ;;
             2 ) m=HEROIN
                 ;;
-            3 ) m=ACID
+            3 ) m=FENTANYL
                 ;;
-            4 ) m=WEED
+            4 ) m=METH
                 ;;
-            5 ) m=SPEED
+            5 ) m=LSD
                 ;;
-            6 ) m=LUDES
+            6 ) m=WEED
                 ;;
         esac
         FOUND=$n
@@ -835,7 +932,7 @@ FINDLUDES () {
 
 PARAQUAT () {
     HUD
-    echo 'THERE IS SOME WEED THAT SMELLS LIKE PARAQUAT HERE !! IT LOOKS GOOD !!'
+    echo 'THERE IS SOME METH THAT SMELLS LIKE PARAQUAT HERE !! IT LOOKS GOOD !!'
     read -n1 -p 'WILL YOU SMOKE IT ?'
     if [[ $REPLY = [y/Y] ]]; then
         HUD
@@ -849,17 +946,17 @@ PARAQUAT () {
 
 }
 
-CHEAPLUDES () {
+CHEAPWEED () {
     HUD
     LPRICE=$((LPRICE/6))
-    read -n1 -p 'RIVAL DRUG DEALERS RADED A PHARMACY AND ARE SELLING  C H E A P   L U D E S !!!'
+    read -n1 -p 'RIVAL DRUG DEALERS RADED A PHARMACY AND ARE SELLING  C H E A P   W E E D !!!'
     MAINMENU
 }
 
-CHEAPACID () {
+CHEAPFENTANYL () {
     HUD
     APRICE=$((APRICE/10))
-    read -n1 -p 'THE MARKET HAS BEEN FLOODED WITH CHEAP HOME MADE ACID !!!'
+    read -n1 -p 'THE MARKET HAS BEEN FLOODED WITH CHEAP HOME MADE FENTANYL !!!'
     MAINMENU
 }
 
