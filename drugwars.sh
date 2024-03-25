@@ -12,7 +12,7 @@ GAMEDATE () { # true to original date, format is MM / DD / YYYY
 ROLLPRICES () { # this happens at the start of the game and whenever you jet
     CPRICE=$(( $(shuf -n1 --input-range=1200-1800) * 10 ))
     HPRICE=$(( $(shuf -n1 -i1000-1500) * 10 ))
-    APRICE=$(( $(shuf -n1 -i600-900) * 10 ))
+    FPRICE=$(( $(shuf -n1 -i600-900) * 10 ))
     WPRICE=$(( $(shuf -n1 -i400-600) * 10 ))
     SPRICE=$(( $(shuf -n1 -i80-400) * 10 ))
     LPRICE=$(( $(shuf -n1 -i40-100) * 10 ))
@@ -257,7 +257,7 @@ HEY DUDE, THE PRICES OF DRUGS HERE ARE:
 
 ${SPWI}COCAINE    $CPRICE$(SP $((WID-WI-11-${#CPRICE})))METH       $WPRICE
 ${SPWI}HEROIN     $HPRICE$(SP $((WID-WI-11-${#HPRICE})))LSD      $SPRICE
-${SPWI}FENTANYL       $APRICE$(SP $((WID-WI-11-${#APRICE})))WEED      $LPRICE
+${SPWI}FENTANYL       $FPRICE$(SP $((WID-WI-11-${#FPRICE})))WEED      $LPRICE
 EOF
     )""
     HUD
@@ -335,13 +335,13 @@ STASHING () { # Stash product type selector
             ;;
         [h/H] ) STASHDEPOSIT HEROIN
             ;;
-        [a/A] ) STASHDEPOSIT FENTANYL
+        [f/F] ) STASHDEPOSIT FENTANYL
             ;;
-        [w/W] ) STASHDEPOSIT METH
+        [m/M] ) STASHDEPOSIT METH
             ;;
-        [s/S] ) STASHDEPOSIT LSD
+        [l/L] ) STASHDEPOSIT LSD
             ;;
-        [l/L] ) STASHDEPOSIT WEED
+        [w/W] ) STASHDEPOSIT WEED
             ;;
         * ) STASH
             ;;
@@ -493,7 +493,7 @@ BUYSELLJET () {
     case $BSJ in
          [b/B] ) echo && BUYING 
              ;;
-         [s/S] ) echo && SELLING
+         [l/L] ) echo && SELLING
              ;;
          [j/J] ) echo && JET
              ;;
@@ -509,13 +509,13 @@ BUYING () {
         ;;
     [h/H] ) BUYDRUG HEROIN
         ;;
-    [a/A] ) BUYDRUG FENTANYL
+    [f/F] ) BUYDRUG FENTANYL
         ;;
-    [w/W] ) BUYDRUG METH
+    [m/M] ) BUYDRUG METH
         ;;
-    [s/S] ) BUYDRUG LSD
+    [l/L] ) BUYDRUG LSD
         ;;
-    [l/L] ) BUYDRUG WEED
+    [w/W] ) BUYDRUG WEED
         ;;
     * ) MAINMENU
         ;;
@@ -525,7 +525,7 @@ esac
 AFFORDABILITY () {
     let C_AFFORD=CASH/CPRICE
     let H_AFFORD=CASH/HPRICE
-    let A_AFFORD=CASH/APRICE
+    let A_AFFORD=CASH/FPRICE
     let W_AFFORD=CASH/WPRICE
     let S_AFFORD=CASH/SPRICE
     let L_AFFORD=CASH/LPRICE
@@ -564,13 +564,13 @@ SELLING () {
         ;;
     [h/H] ) SELLDRUG HEROIN
         ;;
-    [a/A] ) SELLDRUG FENTANYL
+    [f/F] ) SELLDRUG FENTANYL
         ;;
-    [w/W] ) SELLDRUG METH
+    [m/M] ) SELLDRUG METH
         ;;
-    [s/S] ) SELLDRUG LSD
+    [l/L] ) SELLDRUG LSD
         ;;
-    [l/L] ) SELLDRUG WEED
+    [w/W] ) SELLDRUG WEED
         ;;
     * ) MAINMENU
         ;;
@@ -580,7 +580,7 @@ esac
 PROFITABILITY () {
     let C_PROFT=$((COCAINE*CPRICE))
     let H_PROFIT=$((HEROIN*HPRICE))
-    let A_PROFIT=$((FENTANYL*APRICE))
+    let A_PROFIT=$((FENTANYL*FPRICE))
     let W_PROFIT=$((METH*WPRICE))
     let S_PROFIT=$((LSD*SPRICE))
     let L_PROFIT=$((WEED*LPRICE))
@@ -955,7 +955,7 @@ CHEAPWEED () {
 
 CHEAPFENTANYL () {
     HUD
-    APRICE=$((APRICE/10))
+    FPRICE=$((FPRICE/10))
     read -n1 -p 'THE MARKET HAS BEEN FLOODED WITH CHEAP HOME MADE FENTANYL !!!'
     MAINMENU
 }
