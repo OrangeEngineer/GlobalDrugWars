@@ -4,9 +4,10 @@
 # Heavily based on a game by John E. Dell 1984, who was ahead of his time.
 # By A. J. S. (2019)
 
+CURRENT_USER=""
 
 GAMEDATE () { # true to original date, format is MM / DD / YYYY
-    echo $(date --date=" 4 Dec 1983 +"$1" days" +"%m / %d / %y")
+    echo $(date --date=" 1 Mar 2024 +"$1" days" +"%m / %d / %y")
 }
 
 ROLLPRICES () { # this happens at the start of the game and whenever you jet
@@ -16,6 +17,10 @@ ROLLPRICES () { # this happens at the start of the game and whenever you jet
     MPRICE=$(( $(shuf -n1 -i400-600) * 10 ))
     LPRICE=$(( $(shuf -n1 -i80-400) * 10 ))
     WPRICE=$(( $(shuf -n1 -i40-100) * 10 ))
+}
+
+set_username() {
+    CURRENT_USER="$1"
 }
 
 
@@ -115,7 +120,7 @@ $(SP $((WID-5)))DRUG WARS
 
 $(SP $((WID-8)))A GAME BASED ON
 
-$(SP $((WID-12)))THE NEW YORK DRUG MARKET
+$(SP $((WID-12)))THE GLOBAL DRUG MARKET
 
 
 $(SP $((WID-15)))ORIGINAL BY JOHN E. DELL (1984)
@@ -130,9 +135,8 @@ EOF
     echo
     SP $((WID-13))
     read -p "Enter your username:" USERNAME
-
-    save_status "$USERNAME"
-    load_status "$USERNAME"
+    set_username "$USERNAME"
+    CHECKING_LOAD_SAVE
     echo
 
     SP $((WID-13))
@@ -160,12 +164,12 @@ $(SP $((WID-20)))police $(echo '!!')  Your main drug stash will be
 $(SP $((WID-20)))in NEW YORK.
 $(SP $((WID-20)))The prices of drugs per unit are:
 $(SP $((WID-20)))
-$(SP $((WID-20)))      COCAINE     15000-30000
-$(SP $((WID-20)))      HEROIN      5000-14000
-$(SP $((WID-20)))      FENTANYL        1000-4500
-$(SP $((WID-20)))      METH        300-900
-$(SP $((WID-20)))      LSD       70-250
-$(SP $((WID-20)))      WEED       10-60
+$(SP $((WID-20)))      COCAINE     12000-18000
+$(SP $((WID-20)))      HEROIN      10000-15000
+$(SP $((WID-20)))      FENTANYL    6000-9000
+$(SP $((WID-20)))      METH        4000-6000
+$(SP $((WID-20)))      LSD         800-4000
+$(SP $((WID-20)))      WEED        400-1000
 $(SP $((WID-20)))
 $(SP $((WID-20)))    (HIT ANY KEY TO START GAME)
 
@@ -177,8 +181,17 @@ EOF
         MAINMENU
 }
 
+CHECKING_LOAD_SAVE () {
+    if [ ! -d "saves" ]; then
+        mkdir -p "saves"
+    fi
+
+    load_status
+
+}
+
 save_status() {
-    USER_FILE="${1}_status.txt"  # The user's status file
+    USER_FILE="saves/${CURRENT_USER}_status.txt"  # The user's status file
     cat << EOF > "$USER_FILE"
 DAY=$DAY
 GEO=$GEO
@@ -204,19 +217,22 @@ STATE=$STATE
 HEALTH=$HEALTH
 COPS=$COPS
 EOF
-    echo "Status saved for user: $1"
-    echo "Saved status for user: $1 on $(date)" >> game_log.txt
+    echo "Status saved for user: $CURRENT_USER"
+    echo "Saved status for user: $CURRENT_USER on $(date)" >> game_log.txt
 }
 
 load_status() {
-    USER_FILE="${1}_status.txt"  # The user's status file
+    USER_FILE="saves/${CURRENT_USER}_status.txt"  # The user's status file
     if [ -f "$USER_FILE" ]; then
         source "$USER_FILE"
-        echo "Status loaded for user: $1"
-        echo "Loaded status for user: $1 on $(date)" >> game_log.txt
+        echo "Status loaded for user: $CURRENT_USER"
+        echo "Loaded status for user: $CURRENT_USER on $(date)" >> game_log.txt
     else
-        echo "No saved status found for user: $1"
-        echo "Attempted to load status for user: $1 on $(date)" >> game_log.txt
+        echo "No saved status found for user: $CURRENT_USER"
+        echo "Attempted to load status for user: $CURRENT_USER on $(date)" >> game_log.txt
+
+        echo "Creating new saved status for user: $CURRENT_USER"
+        save_status 
     fi
 }
 
